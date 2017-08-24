@@ -1,0 +1,9 @@
+[submodule "third/pink"]
+	path = third/pink
+	url = https://github.com/Qihoo360/pink.git
+[submodule "third/slash"]
+	path = third/slash
+	url = https://github.com/Qihoo360/slash.git
+[submodule "third/zeppelin-client"]
+	path = third/zeppelin-client
+	url = https://github.com/Qihoo360/zeppelin-client.git
