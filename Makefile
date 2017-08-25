@@ -40,26 +40,26 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
+.PHONY: clean all distclean
+
 all : $(TESTS)
 
 clean :
-	rm -f $(TESTS) $(GTEST_A) $(GTEST_ALL_O) $(GTEST_MAIN_O)
+	rm -f $(TESTS) *.o
+
+distclean:
+	@echo "clean gtest"
+	@rm -rf $(GTEST_ALL_O)
+	make -C $(PINK_PATH)/pink clean
+	make -C $(SLASH_PATH)/slash clean
+	make -C $(LIBZP_PATH)/libzp clean
 
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 GTEST_ALL=$(GTEST_DIR)/src/gtest-all.cc
 GTEST_ALL_O= $(GTEST_ALL:.cc=.o)
-GTEST_MAIN=$(GTEST_DIR)/src/gtest_main.cc
-GTEST_MAIN_O= $(GTEST_MAIN:.cc=.o)
-GTEST_A=$(GTEST_DIR)/gtest_main.a
 
 $(GTEST_ALL_O) : $(GTEST_ALL) $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c $< -o $@
-
-$(GTEST_MAIN_O) : $(GTEST_MAIN) $(GMOCK_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c $< -o $@
-
-$(GTEST_A) : $(GTEST_MAIN_O) $(GTEST_ALL_O)
-	$(AR) $(ARFLAGS) $@ $^
 
 $(SLASH_LIBRARY):
 	@echo "make slash"
@@ -75,8 +75,19 @@ $(LIBZP_LIBRARY): $(PINK_LIBRARY) $(SLASH_LIBRARY)
 
 # Builds zeppelin tests.
 
-zp_basis_tests: zp_sync_tests.cc $(DEP_LIBS) $(GTEST_A)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $^ $(LDFLAGS) -o $@
+# Objects
+zp_basis_tests.o : zp_basis_tests.cc zp_tests_env.h
+	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) -c $<
 
-zp_sync_tests: zp_sync_tests.cc $(DEP_LIBS) $(GTEST_A)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $^ $(LDFLAGS) -o $@
+zp_sync_tests.o : zp_sync_tests.cc zp_tests_env.h
+	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) -c $<
+
+zp_tests_env.o : zp_tests_env.cc zp_tests_env.h
+	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) -c $<
+
+# Binaries
+zp_basis_tests: zp_basis_tests.o zp_tests_env.o $(DEP_LIBS) $(GTEST_ALL_O)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+zp_sync_tests: zp_sync_tests.o zp_tests_env.o $(DEP_LIBS) $(GTEST_ALL_O)
+	$(CXX) $^ $(LDFLAGS) -o $@
