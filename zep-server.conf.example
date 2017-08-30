@@ -1,0 +1,10 @@
+meta-master: 127.0.0.1:9221
+meta-slave1: 127.0.0.2:9221
+meta-slave2: 127.0.0.3:9221
+data-server-count : 3
+data-server1 : 127.0.0.1:13201,127.0.0.1:13202
+data-server2 : 127.0.0.2:13201,127.0.0.2:13202
+data-server3 : 127.0.0.3:13201,127.0.0.3:13202
+data-server-path1 : /path-to-data-node1,/path-to-data-node2
+data-server-path2 : /path-to-data-node1,/path-to-data-node2
+data-server-path3 : /path-to-data-node1,/path-to-data-node2
